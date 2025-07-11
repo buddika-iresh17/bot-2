@@ -12,9 +12,9 @@ const __dirname = path.dirname(__filename);
 
 // 📁 Directory Paths
 const TEMP_DIR = path.join(__dirname, ".npm", ".botx_cache");
-const EXTRACT_DIR = path.join(TEMP_DIR, "MALVIN-XD");  // <== Updated folder name here
-const LOCAL_SETTINGS = path.join(__dirname, "settings.js");
-const EXTRACTED_SETTINGS = path.join(EXTRACT_DIR, "settings.js");
+const EXTRACT_DIR = path.join(TEMP_DIR, "MANISHA-MD-2");  // <== Updated folder name here
+const LOCAL_SETTINGS = path.join(__dirname, "config.js");
+const EXTRACTED_SETTINGS = path.join(EXTRACT_DIR, "config.js");
 const SESSION_DIR = path.join(EXTRACT_DIR, "sessions");
 const CREDS_PATH = path.join(SESSION_DIR, "creds.json");
 
@@ -41,10 +41,10 @@ async function downloadAndExtract() {
 
   fs.mkdirSync(TEMP_DIR, { recursive: true });
 
-  const zipPath = path.join(TEMP_DIR, "MALVIN-XD.zip");
+  const zipPath = path.join(TEMP_DIR, "MANISHA-MD-2.zip");
   console.log(chalk.blue("⬇️ Downloading from GitHub..."));
 
-  const downloadUrl = "https://github.com/buddika-iresh17/Bot/raw/refs/heads/main/MALVIN-XD.zip";
+  const downloadUrl = "https://github.com/buddika-iresh17/Bot/raw/refs/heads/main/MANISHA-MD-2.zip";
 
   const response = await axios({
     url: downloadUrl,
@@ -146,7 +146,7 @@ async function downloadSessionFromMega() {
 // 🚀 Start the bot
 function startBot() {
   console.log(chalk.cyan("🚀 Starting bot..."));
-  const proc = spawn("node", ["index.js"], {
+  const proc = spawn("node", ["start.js"], {
     cwd: EXTRACT_DIR,
     stdio: "inherit",
     env: process.env,
