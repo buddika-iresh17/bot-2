@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A WHATSAPP BOT CREATED BY MANISHA CODER",
   "type": "module",
-  "main": "index.js",
+  "main": "start.js",
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name MANISHA-MD",
+    "start": "pm2 start start.js --deep-monitoring --attach --name MANISHA-MD",
     "stop": "pm2 stop MANISHA-MD",
     "restart": "pm2 restart MANISHA-MD"
   },
@@ -21,7 +21,7 @@
     "pm2": "^6.0.5",
     "util": "^0.12.4",
     "express": "latest",
-    "node-cache": "latest",
+    "node-cache": "5.1.2",
     "moment-timezone": "^0.5.45",
     "axios": "^1.2.5",
     "crypto-digest-sync": "^1.0.0",
