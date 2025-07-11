@@ -70,7 +70,6 @@ async function downloadAndExtract() {
   "url": "https://github.com/buddika-iresh17/Bot/raw/refs/heads/main/MALVIN-XD-main.zip",
   "method": "GET",
   "responseType": "stream"
-}
   //===
   });
   const _0x212ad4 = _0x134c2e.createWriteStream(_0x35263a);
