@@ -2,9 +2,10 @@
   "name": "MANISHA-MD",
   "version": "1.0.0",
   "description": "A WHATSAPP BOT CREATED BY MANISHA CODER",
-  "main": "start.js",
+  "type": "module",
+  "main": "index.js",
   "scripts": {
-    "start": "pm2 start start.js --deep-monitoring --attach --name MANISHA-MD",
+    "start": "pm2 start index.js --deep-monitoring --attach --name MANISHA-MD",
     "stop": "pm2 stop MANISHA-MD",
     "restart": "pm2 restart MANISHA-MD"
   },
