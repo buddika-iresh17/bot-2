@@ -1,13 +1,14 @@
-const fs = require("fs");
-const path = require("path");
-const axios = require("axios");
-const AdmZip = require("adm-zip");
-const { spawn } = require("child_process");
-const chalk = require("chalk");
-const { fileURLToPath, pathToFileURL } = require("url");
-const { File } = require("megajs");
+import fs from "fs";
+import path from "path";
+import axios from "axios";
+import AdmZip from "adm-zip";
+import { spawn } from "child_process";
+import chalk from "chalk";
+import { fileURLToPath } from "url";
+import { File } from "megajs";
 
-const __filename = fileURLToPath(__filename);
+// ES Modules don't have __filename and __dirname by default:
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 📁 Directory Paths
@@ -92,13 +93,14 @@ async function applyLocalSettings() {
 async function downloadSessionFromMega() {
   let settings;
   try {
-    settings = require(EXTRACTED_SETTINGS);
+    // Use dynamic import to read config.js ES module
+    settings = await import(pathToFileURL(EXTRACTED_SETTINGS).href);
   } catch (err) {
     console.error(chalk.red("🌀 ᴍᴀɴɪꜱʜᴀ-ᴍᴅ 💕 Failed to load config.js ❌..."), err);
     process.exit(1);
   }
 
-  const SESSION_ID = settings.SESSION_ID;
+  const SESSION_ID = settings.default?.SESSION_ID || settings.SESSION_ID;
   if (!SESSION_ID || !SESSION_ID.startsWith("manisha~")) {
     console.error(chalk.red("🌀 ᴍᴀɴɪꜱʜᴀ-ᴍᴅ 💕 Invalid or missing SESSION_ID in config.js ❌..."));
     process.exit(1);
