@@ -1,158 +1,130 @@
-import fs from "fs";
-import path from "path";
-import axios from "axios";
-import AdmZip from "adm-zip";
-import { spawn } from "child_process";
-import chalk from "chalk";
-import { fileURLToPath, pathToFileURL } from "url";
-import { File } from "megajs";
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
+const AdmZip = require('adm-zip');
+const { spawn } = require('child_process');
+const { File } = require('megajs');
+require('dotenv').config(); // load .env
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// CONFIGURATION
+const GITHUB_ZIP_URL = 'https://github.com/buddika-iresh17/Bot/raw/refs/heads/main/MANISHA-MD-2.zip';
+const DOWNLOAD_PATH = path.resolve(__dirname, 'bot_temp');
+const ZIP_PATH = path.join(DOWNLOAD_PATH, 'repo.zip');
+const EXTRACT_PATH = path.join(DOWNLOAD_PATH, 'extracted');
+const SETTINGS_SOURCE_PATH = path.resolve('./config.js');
+const SESSION_FILE_NAME = 'session/creds.json';
 
-const TEMP_DIR = path.join(__dirname, ".npm", ".botx_cache");
-const EXTRACT_DIR = path.join(TEMP_DIR, "bot-MANISHA-MD-2");
-const LOCAL_SETTINGS = path.join(__dirname, "config.js");
-const EXTRACTED_SETTINGS = path.join(EXTRACT_DIR, "config.js");
-const SESSION_DIR = path.join(EXTRACT_DIR, "sessions");
-const CREDS_PATH = path.join(SESSION_DIR, "creds.json");
+const sessdata = process.env.SESSION_ID;
+if (!sessdata) {
+  console.error('❌ SESSION_ID not found in environment. Set it in .env file or export before running.');
+  process.exit(1);
+}
+const MEGA_SESSION_URL = `https://mega.nz/file/${sessdata}`;
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+// Ensure folders
+if (fs.existsSync(DOWNLOAD_PATH)) fs.rmSync(DOWNLOAD_PATH, { recursive: true, force: true });
+fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
+fs.mkdirSync(EXTRACT_PATH, { recursive: true });
 
-async function countJSFiles(dir) {
-  let count = 0;
-  const files = fs.readdirSync(dir);
-  for (const file of files) {
-    const fullPath = path.join(dir, file);
-    const stat = fs.statSync(fullPath);
-    if (stat.isDirectory()) {
-      count += await countJSFiles(fullPath);
-    } else if (file.endsWith(".js")) {
-      count++;
-    }
-  }
-  return count;
+// Step 1: Download GitHub ZIP
+async function downloadGitHubZip() {
+  console.log('📥 Downloading GitHub ZIP...');
+  const response = await axios.get(GITHUB_ZIP_URL, { responseType: 'arraybuffer' });
+  fs.writeFileSync(ZIP_PATH, response.data);
+  console.log('✅ ZIP downloaded to:', ZIP_PATH);
 }
 
-async function downloadAndExtract() {
-  if (fs.existsSync(TEMP_DIR)) {
-    console.log(chalk.yellow("🧹 Cleaning old files..."));
-    fs.rmSync(TEMP_DIR, { recursive: true, force: true });
-  }
-  fs.mkdirSync(TEMP_DIR, { recursive: true });
-
-  const zipPath = path.join(TEMP_DIR, "repo.zip");
-  console.log(chalk.blue("⬇️ Connecting to remote repo and downloading zip..."));
-
-  const response = await axios({
-    url: "https://github.com/buddika-iresh17/Bot/raw/refs/heads/main/MANISHA-MD-2.zip",
-    method: "GET",
-    responseType: "stream",
-  });
-
-  const writer = fs.createWriteStream(zipPath);
-  response.data.pipe(writer);
-
-  await new Promise((resolve, reject) => {
-    writer.on("finish", resolve);
-    writer.on("error", reject);
-  });
-
-  console.log(chalk.green("♻️ Download complete. Extracting files..."));
-  new AdmZip(zipPath).extractAllTo(TEMP_DIR, true);
-
-  try {
-    fs.unlinkSync(zipPath);
-    console.log(chalk.green("🧹 Archive removed."));
-  } catch {
-    console.warn(chalk.yellow("⚠️ Failed to remove archive, continuing..."));
-  }
-
-  const pluginsFolder = path.join(EXTRACT_DIR, "plugins");
-
-  // Wait and check for plugins folder to have enough .js files (up to 40 seconds max)
-  for (let attempt = 0; attempt < 28; attempt++) {
-    if (fs.existsSync(pluginsFolder)) {
-      try {
-        const jsCount = await countJSFiles(pluginsFolder);
-        if (jsCount >= 150) { // 0x96 = 150 decimal
-          console.log(chalk.green(`✅ Loaded ${jsCount} plugin files.`));
-          break;
-        } else {
-          console.log(chalk.gray(`⏳ Plugins loading: ${jsCount}/150 files found...`));
-        }
-      } catch {
-        console.log(chalk.red("⚠️ Error reading plugins folder, retrying..."));
-      }
-    } else {
-      console.log(chalk.gray("🔍 Waiting for plugins folder..."));
-    }
-    await delay(500);
-  }
+// Step 2: Extract ZIP
+function extractZip() {
+  console.log('📦 Extracting ZIP...');
+  const zip = new AdmZip(ZIP_PATH);
+  zip.extractAllTo(EXTRACT_PATH, true);
+  console.log('✅ Extracted to:', EXTRACT_PATH);
 }
 
-async function applyLocalSettings() {
-  if (!fs.existsSync(LOCAL_SETTINGS)) {
-    console.warn(chalk.red("⚠️ Local settings.js not found. Skipping applying local settings."));
-    return;
-  }
-  try {
-    fs.copyFileSync(LOCAL_SETTINGS, EXTRACTED_SETTINGS);
-    console.log(chalk.green("🛠️ Local settings applied."));
-  } catch (error) {
-    console.error(chalk.red("❌ Failed applying local settings."), error);
-  }
-  await delay(1000);
-}
-
-async function downloadSessionFromMega() {
-  let settings;
-  try {
-    settings = await import(pathToFileURL(EXTRACTED_SETTINGS).href);
-  } catch (error) {
-    console.error(chalk.red("❌ Failed to load settings."), error);
+// Step 3: Copy config.js
+function applySettings() {
+  console.log('⚙️ Applying config.js...');
+  if (!fs.existsSync(SETTINGS_SOURCE_PATH)) {
+    console.error('❌ config.js not found at:', SETTINGS_SOURCE_PATH);
     process.exit(1);
   }
 
-  const SESSION_ID = settings.default?.SESSION_ID || settings.SESSION_ID;
-  if (!SESSION_ID || !SESSION_ID.startsWith("manisha~")) {
-    console.error(chalk.red("❌ Invalid or missing SESSION_ID in settings.js"));
-    process.exit(1);
-  }
+  const mainFolder = getFirstFolder(EXTRACT_PATH);
+  const destSettings = path.join(mainFolder, 'config.js');
 
-  const megaFileId = SESSION_ID.replace("manisha~", "");
-  const megaFile = File.fromURL("https://mega.nz/file/" + megaFileId);
+  fs.copyFileSync(SETTINGS_SOURCE_PATH, destSettings);
+  console.log('✅ config.js copied to:', destSettings);
+}
 
-  console.log(chalk.blue("📡 Downloading session data from remote Mega storage..."));
+// Step 4: Download session from MEGA
+async function downloadMegaSession() {
+  console.log('🔐 Downloading MEGA session...');
+  const file = File.fromURL(MEGA_SESSION_URL);
 
-  await new Promise((resolve, reject) => {
-    megaFile.download((err, data) => {
-      if (err) return reject(err);
-      fs.mkdirSync(SESSION_DIR, { recursive: true });
-      fs.writeFileSync(CREDS_PATH, data);
-      console.log(chalk.green("💾 Session data saved."));
-      resolve();
+  return new Promise((resolve, reject) => {
+    file.loadAttributes((err) => {
+      if (err) return reject('❌ Failed to load MEGA file attributes.');
+
+      const mainFolder = getFirstFolder(EXTRACT_PATH);
+      const sessionPath = path.join(mainFolder, SESSION_FILE_NAME);
+      const stream = fs.createWriteStream(sessionPath);
+
+      file.download().pipe(stream);
+
+      stream.on('finish', () => {
+        console.log('✅ Session downloaded to:', sessionPath);
+        resolve();
+      });
+
+      stream.on('error', reject);
     });
   });
-
-  await delay(1000);
 }
 
-function startBot() {
-  console.log(chalk.cyan("🚀 Starting bot..."));
-  const child = spawn("node", ["start.js"], {
-    cwd: EXTRACT_DIR,
-    stdio: "inherit",
-    env: process.env,
-  });
-  child.on("close", code => {
-    console.log(chalk.red(`🚨 Bot stopped with exit code ${code}`));
+// Step 5: Run Bot
+function runBot() {
+  const mainFolder = getFirstFolder(EXTRACT_PATH);
+  const entryPoint = findEntryPoint(mainFolder);
+
+  if (!entryPoint) {
+    console.error('❌ Could not find start.js or index.js in:', mainFolder);
+    process.exit(1);
+  }
+
+  console.log('🚀 Running bot from:', entryPoint);
+  const child = spawn('node', [entryPoint], { stdio: 'inherit' });
+
+  child.on('close', (code) => {
+    console.log(`👋 Bot exited with code ${code}`);
   });
 }
 
+// Utilities
+function getFirstFolder(basePath) {
+  const items = fs.readdirSync(basePath);
+  const folder = items.find(f => fs.statSync(path.join(basePath, f)).isDirectory());
+  return folder ? path.join(basePath, folder) : basePath;
+}
+
+function findEntryPoint(basePath) {
+  const possibleFiles = ['start.js', 'index.js'];
+  for (const file of possibleFiles) {
+    const fullPath = path.join(basePath, file);
+    if (fs.existsSync(fullPath)) return fullPath;
+  }
+  return null;
+}
+
+// MAIN RUN
 (async () => {
-  await downloadAndExtract();
-  await applyLocalSettings();
-  await downloadSessionFromMega();
-  startBot();
+  try {
+    await downloadGitHubZip();
+    extractZip();
+    applySettings();
+    await downloadMegaSession();
+    runBot();
+  } catch (err) {
+    console.error('💥 Error during setup:', err);
+  }
 })();
