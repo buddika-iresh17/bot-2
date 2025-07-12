@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  SESSION_ID: process.env.SESSION_ID || "BycRgDja#LWoUdcYkpYXQCbqPUJEondSin_M2-BUs-faYy6Hv8Iw",
+  SESSION_ID: process.env.SESSION_ID,
   MODE: process.env.MODE || "private",
   PREFIX: process.env.PREFIX || ".",
   AUTO_REACT: process.env.AUTO_REACT === "true",
@@ -15,5 +15,5 @@ module.exports = {
   AUTO_TYPING: process.env.AUTO_TYPING === "true",
   AUTO_RECORDING: process.env.AUTO_RECORDING === "true",
   ALWAYS_ONLINE: process.env.ALWAYS_ONLINE === "true",
-  UNIFIED_PROTECTION: process.env.UNIFIED_PROTECTION || "kick", // "off" | "warn" | "kick" | "strict"
+  UNIFIED_PROTECTION: process.env.UNIFIED_PROTECTION || "kick",
 };
