@@ -10,6 +10,7 @@ import { File } from "megajs";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Paths
 const TEMP_DIR = path.join(__dirname, ".npm", ".botx_cache");
 const EXTRACT_DIR = path.join(TEMP_DIR, "MANISHA-MD-2");
 const LOCAL_SETTINGS = path.join(__dirname, "config.js");
@@ -17,10 +18,10 @@ const EXTRACTED_SETTINGS = path.join(EXTRACT_DIR, "config.js");
 const SESSION_DIR = path.join(EXTRACT_DIR, "sessions");
 const CREDS_PATH = path.join(SESSION_DIR, "creds.json");
 
-// Helper: delay for ms
+// Utility delay
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper: recursively count JS files in a folder
+// Recursively count JS files in folder
 function countJSFiles(folder) {
   let count = 0;
   for (const file of fs.readdirSync(folder)) {
@@ -34,6 +35,7 @@ function countJSFiles(folder) {
   return count;
 }
 
+// Download the bot zip and extract
 async function downloadAndExtract() {
   if (fs.existsSync(TEMP_DIR)) {
     console.log(chalk.yellow("🧹 Cleaning old files..."));
@@ -53,8 +55,8 @@ async function downloadAndExtract() {
     responseType: "stream",
   });
 
+  // Write stream to file
   const writer = fs.createWriteStream(zipPath);
-
   await new Promise((resolve, reject) => {
     response.data.pipe(writer);
     writer.on("finish", resolve);
@@ -63,8 +65,10 @@ async function downloadAndExtract() {
 
   console.log(chalk.green("♻️ Extracting archive..."));
 
+  // Extract all files
   new AdmZip(zipPath).extractAllTo(TEMP_DIR, true);
 
+  // Delete zip after extraction
   try {
     fs.unlinkSync(zipPath);
     console.log(chalk.green("🧹 Archive removed."));
@@ -72,7 +76,7 @@ async function downloadAndExtract() {
     console.warn(chalk.yellow("⚠️ Failed to remove archive, continuing..."));
   }
 
-  // Wait for plugins folder to have enough JS files (150) or timeout after 40 loops (8 sec)
+  // Wait for plugins folder to have enough JS files or timeout
   const pluginsFolder = path.join(EXTRACT_DIR, "plugins");
   const requiredPlugins = 150;
 
@@ -96,6 +100,7 @@ async function downloadAndExtract() {
   }
 }
 
+// Apply local config.js over extracted config.js
 async function applyLocalSettings() {
   if (!fs.existsSync(LOCAL_SETTINGS)) {
     console.warn(chalk.red("⚠️ Local config.js not found. Skipping local settings."));
@@ -112,6 +117,7 @@ async function applyLocalSettings() {
   await delay(1000);
 }
 
+// Download session data from Mega.nz using SESSION_ID
 async function downloadSessionFromMega() {
   let settings;
   try {
@@ -121,7 +127,7 @@ async function downloadSessionFromMega() {
     process.exit(1);
   }
 
-  // Support either default export or normal export
+  // Support default export or named export
   const config = settings.default ?? settings;
   const SESSION_ID = config.SESSION_ID;
 
@@ -130,6 +136,7 @@ async function downloadSessionFromMega() {
     process.exit(1);
   }
 
+  // Extract file ID from SESSION_ID
   const megaFileId = SESSION_ID.replace("manisha~", "");
   const megaFileUrl = `https://mega.nz/file/${megaFileId}`;
   const megaFile = File.fromURL(megaFileUrl);
@@ -150,6 +157,7 @@ async function downloadSessionFromMega() {
   await delay(1000);
 }
 
+// Start the bot by spawning child process to run start.js
 function startBot() {
   console.log(chalk.cyan("🚀 Starting bot..."));
 
@@ -164,6 +172,7 @@ function startBot() {
   });
 }
 
+// Main bootstrapper flow
 (async () => {
   try {
     await downloadAndExtract();
