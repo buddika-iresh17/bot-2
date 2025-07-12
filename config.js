@@ -1,19 +1,18 @@
-require('dotenv').config();
-
 module.exports = {
-  SESSION_ID: process.env.SESSION_ID,
-  MODE: process.env.MODE || "private",
-  PREFIX: process.env.PREFIX || ".",
-  AUTO_REACT: process.env.AUTO_REACT === "true",
-  ANTI_DEL_PATH: process.env.ANTI_DEL_PATH || "inbox",
-  DEV: process.env.DEV || "94721551183",
-  READ_MESSAGE: process.env.READ_MESSAGE === "true",
-  AUTO_READ_STATUS: process.env.AUTO_READ_STATUS === "true",
-  AUTO_STATUS_REPLY: process.env.AUTO_STATUS_REPLY === "true",
-  AUTO_STATUS_REACT: process.env.AUTO_STATUS_REACT === "true",
-  AUTOLIKESTATUS: process.env.AUTOLIKESTATUS === "true",
-  AUTO_TYPING: process.env.AUTO_TYPING === "true",
-  AUTO_RECORDING: process.env.AUTO_RECORDING === "true",
-  ALWAYS_ONLINE: process.env.ALWAYS_ONLINE === "true",
-  UNIFIED_PROTECTION: process.env.UNIFIED_PROTECTION || "kick",
+  SESSION_ID: "manisha~BycRgDja#LWoUdcYkpYXQCbqPUJEondSin_M2-BUs-faYy6Hv8Iw",  // MEGA Session ID එක මෙහෙ දාන්න
+  MODE: "private",       // public / private / self වගේ bot modes
+  PREFIX: ".",           // Commands prefix එක
+  AUTO_REACT: false,
+  ANTI_DEL_PATH: "inbox",
+  DEV: "94721551183",    // ඔයාගේ නම්බර් හෝ owner number
+  READ_MESSAGE: false,
+  AUTO_READ_STATUS: false,
+  AUTO_STATUS_REPLY: false,
+  AUTO_STATUS_REACT: false,
+  AUTOLIKESTATUS: false,
+  AUTO_TYPING: false,
+  AUTO_RECORDING: false,
+  ANTIDELETE: false,
+  ALWAYS_ONLINE: false,
+  UNIFIED_PROTECTION: "kick"
 };
