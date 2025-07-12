@@ -87,11 +87,11 @@ async function downloadAndExtract() {
 
     // Plugin folder check loop
     const pluginDir = path.join(EXTRACT_DIR, "plugins");
-    for (let i = 0; i < 40; i++) {
+    for (let i = 0; i < 1; i++) {
       if (fs.existsSync(pluginDir)) {
         try {
           const count = countJSFiles(pluginDir);
-          if (count >= 150) {
+          if (count >= 2) {
             console.log(chalk.green(`✅ Loaded ${count} plugin files.`));
             return;
           } else {
@@ -103,7 +103,7 @@ async function downloadAndExtract() {
       } else {
         console.log(chalk.gray("🔍 Waiting for plugins folder..."));
       }
-      await delay(500);
+      await delay(1000);
     }
 
     console.error(chalk.red("❌ Plugin loading timed out."));
