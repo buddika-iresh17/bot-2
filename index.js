@@ -5,7 +5,7 @@ const AdmZip = require('adm-zip');
 const { spawn } = require('child_process');
 const { File } = require('megajs');
 require('dotenv').config();
-
+console.log("DEBUG SESSION_ID:", process.env.SESSION_ID);
 // CONFIGURATION
 const GITHUB_ZIP_URL = 'https://github.com/buddika-iresh17/Bot/raw/refs/heads/main/MANISHA-MD-2.zip';
 const DOWNLOAD_PATH = path.resolve(__dirname, 'bot_temp');
