@@ -4,7 +4,7 @@ import axios from "axios";
 import AdmZip from "adm-zip";
 import { spawn } from "child_process";
 import chalk from "chalk";
-import { fileURLToPath } from "url";
+import { fileURLToPath, pathToFileURL } from 'url';
 import { File } from "megajs";
 
 // ES Modules don't have __filename and __dirname by default:
