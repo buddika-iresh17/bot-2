@@ -98,7 +98,7 @@ async function downloadSessionFromMega() {
     process.exit(1);
   }
 
-  const SESSION_ID = settings.default?.SESSION_ID || settings.SESSION_ID;
+  const SESSION_ID = settings.SESSION_ID || settings.default?.SESSION_ID;
   if (!SESSION_ID || !SESSION_ID.startsWith("manisha~")) {
     console.error(chalk.red("🌀 ᴍᴀɴɪꜱʜᴀ-ᴍᴅ 💕 Invalid or missing SESSION_ID in config.js ❌..."));
     process.exit(1);
