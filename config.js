@@ -1,5 +1,5 @@
 module.exports = {
-  SESSION_ID: "manisha~BycRgDja#LWoUdcYkpYXQCbqPUJEondSin_M2-BUs-faYy6Hv8Iw",  // MEGA Session ID එක මෙහෙ දාන්න
+  SESSION_ID: "BycRgDja#LWoUdcYkpYXQCbqPUJEondSin_M2-BUs-faYy6Hv8Iw",  // MEGA Session ID එක මෙහෙ දාන්න
   MODE: "private",       // public / private / self වගේ bot modes
   PREFIX: ".",           // Commands prefix එක
   AUTO_REACT: false,
