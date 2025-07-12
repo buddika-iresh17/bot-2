@@ -1,17 +1,17 @@
 
 {
-  "name": "MALVIN-XD",
+  "name": "MANISHA-MD",
   "version": "0.0.7",
   "description": "A WhatsApp Bot Created By Malvin King",
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "pm2 start index.js --deep-monitoring --attach --name MALVIN-XD",
-    "stop": "pm2 stop MALVIN-XD",
-    "restart": "pm2 restart MALVIN-XD"
+    "start": "pm2 start index.js --deep-monitoring --attach --name MANISHA-MD",
+    "stop": "pm2 stop MANISHA-MD",
+    "restart": "pm2 restart MANISHA-MD"
   },
   "dependencies": {
-         "@whiskeysockets/baileys": "npm:baileys-pro@latest",
+    "@whiskeysockets/baileys": "npm:baileys-pro@latest",
     "@adiwajshing/keyed-db": "^0.2.4",
     "@dark-yasiya/yt-dl.js": "1.0.5",
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
