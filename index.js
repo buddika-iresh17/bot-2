@@ -12,8 +12,8 @@ const __dirname = path.dirname(__filename);
 
 const TEMP_DIR = path.join(__dirname, ".npm", ".botx_cache");
 const EXTRACT_DIR = path.join(TEMP_DIR, "bot-MANISHA-MD-2");
-const LOCAL_SETTINGS = path.join(__dirname, "settings.js");
-const EXTRACTED_SETTINGS = path.join(EXTRACT_DIR, "settings.js");
+const LOCAL_SETTINGS = path.join(__dirname, "config.js");
+const EXTRACTED_SETTINGS = path.join(EXTRACT_DIR, "config.js");
 const SESSION_DIR = path.join(EXTRACT_DIR, "sessions");
 const CREDS_PATH = path.join(SESSION_DIR, "creds.json");
 
