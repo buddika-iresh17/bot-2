@@ -85,29 +85,33 @@ async function downloadAndExtract() {
       console.warn(chalk.yellow("⚠️ Failed to remove archive, continuing..."));
     }
 
-    // Plugin folder check loop
+    // Plugin folder check loop with updated count condition
     const pluginDir = path.join(EXTRACT_DIR, "plugins");
-    for (let i = 0; i < 1; i++) {
+    const MAX_RETRIES = 40;
+    const REQUIRED_PLUGIN_COUNT = 1; // Changed from 150 to 1 for single plugin case
+
+    for (let i = 0; i < MAX_RETRIES; i++) {
       if (fs.existsSync(pluginDir)) {
         try {
           const count = countJSFiles(pluginDir);
-          if (count >= 2) {
-            console.log(chalk.green(`✅ Loaded ${count} plugin files.`));
-            return;
+          if (count >= REQUIRED_PLUGIN_COUNT) {
+            console.log(chalk.green(`✅ Loaded ${count} plugin file(s).`));
+            break; // plugins loaded successfully
           } else {
-            console.log(chalk.gray(`⏳ Plugins loading: ${count}/150...`));
+            console.log(chalk.gray(`⏳ Plugins loading: ${count}/${REQUIRED_PLUGIN_COUNT}...`));
           }
-        } catch {
-          console.log(chalk.red("⚠️ Error reading plugins, retrying..."));
+        } catch (error) {
+          console.log(chalk.red(`⚠️ Error reading plugins: ${error.message}, retrying...`));
         }
       } else {
-        console.log(chalk.gray("🔍 Waiting for plugins folder..."));
+        console.log(chalk.gray(`🔍 Waiting for plugins folder... (${i + 1}/${MAX_RETRIES})`));
       }
       await delay(1000);
+      if (i === MAX_RETRIES - 1) {
+        console.error(chalk.red("❌ Plugin loading timed out."));
+        process.exit(1);
+      }
     }
-
-    console.error(chalk.red("❌ Plugin loading timed out."));
-    process.exit(1);
   } catch (err) {
     console.error(chalk.red("❌ Failed to download or extract ZIP:"), err);
     process.exit(1);
