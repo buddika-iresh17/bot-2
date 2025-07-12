@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  SESSION_ID: process.env.SESSION_ID || '',
+  SESSION_ID: process.env.SESSION_ID || 'BycRgDja#LWoUdcYkpYXQCbqPUJEondSin_M2-BUs-faYy6Hv8Iw',
   MODE: process.env.MODE || 'public', // Options: public | private | self | group
   PREFIX: process.env.PREFIX || '.',
   AUTO_REACT: process.env.AUTO_REACT === 'true',
