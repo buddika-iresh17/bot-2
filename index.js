@@ -14,17 +14,19 @@ const EXTRACT_PATH = path.join(DOWNLOAD_PATH, 'extracted');
 const SETTINGS_SOURCE_PATH = path.resolve('./config.js');
 const SESSION_FILE_NAME = 'session/creds.json';
 
-// Validate SESSION_ID
+// 🔍 Validate SESSION_ID
 const sessdata = process.env.SESSION_ID;
-if (!sessdata || !sessdata.includes('#')) {
-  console.error('❌ Invalid SESSION_ID. Must include full MEGA URL with hash.');
+if (
+  !sessdata ||
+  !sessdata.startsWith('https://mega.nz/file/') ||
+  !sessdata.includes('#')
+) {
+  console.error('❌ Invalid SESSION_ID. Must be a full MEGA URL with hash (e.g., https://mega.nz/file/xxx#yyy)');
   process.exit(1);
 }
-let MEGA_SESSION_URL = sessdata.startsWith('https://mega.nz/file/')
-  ? sessdata
-  : 'https://mega.nz/file/' + sessdata;
+const MEGA_SESSION_URL = sessdata;
 
-// Prepare folders
+// 📁 Prepare folders
 function prepareFolders() {
   try {
     if (fs.existsSync(DOWNLOAD_PATH)) {
@@ -38,7 +40,7 @@ function prepareFolders() {
   }
 }
 
-// Download GitHub ZIP
+// ⬇️ Download GitHub ZIP
 async function downloadGitHubZip() {
   console.log('📥 Downloading GitHub ZIP...');
   try {
@@ -50,7 +52,7 @@ async function downloadGitHubZip() {
   }
 }
 
-// Extract ZIP
+// 📦 Extract ZIP
 function extractZip() {
   console.log('📦 Extracting ZIP...');
   try {
@@ -62,7 +64,7 @@ function extractZip() {
   }
 }
 
-// Copy config.js
+// ⚙️ Apply config.js
 function applySettings() {
   console.log('⚙️ Applying config.js...');
   if (!fs.existsSync(SETTINGS_SOURCE_PATH)) {
@@ -74,7 +76,7 @@ function applySettings() {
   console.log('✅ config.js copied to:', destSettings);
 }
 
-// Download MEGA session
+// 🔐 Download MEGA session
 async function downloadMegaSession() {
   console.log('🔐 Downloading MEGA session...');
   const file = File.fromURL(MEGA_SESSION_URL);
@@ -94,7 +96,7 @@ async function downloadMegaSession() {
   });
 }
 
-// Run bot
+// 🚀 Run bot
 function runBot() {
   const mainFolder = getFirstFolder(EXTRACT_PATH);
   const entryPoint = findEntryPoint(mainFolder);
@@ -109,7 +111,7 @@ function runBot() {
   });
 }
 
-// Utility: Get first folder inside a path, fallback to base path
+// 🔧 Utility: Get first folder inside path
 function getFirstFolder(basePath) {
   try {
     const items = fs.readdirSync(basePath);
@@ -121,7 +123,7 @@ function getFirstFolder(basePath) {
   }
 }
 
-// Utility: Find entry point (start.js or index.js)
+// 🔍 Utility: Find entry point (start.js or index.js)
 function findEntryPoint(basePath) {
   const possibleFiles = ['start.js', 'index.js'];
   for (const file of possibleFiles) {
@@ -131,7 +133,7 @@ function findEntryPoint(basePath) {
   return null;
 }
 
-// Main async runner
+// 🧠 Main runner
 (async () => {
   try {
     prepareFolders();
