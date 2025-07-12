@@ -14,14 +14,19 @@ const EXTRACT_PATH = path.join(DOWNLOAD_PATH, 'extracted');
 const SETTINGS_SOURCE_PATH = path.resolve('./config.js');
 const SESSION_FILE_NAME = 'session/creds.json';
 
+// ✅ Parse MEGA SESSION URL from .env
 const sessdata = process.env.SESSION_ID;
-if (!sessdata) {
-  console.error('❌ SESSION_ID not found in environment. Set it in .env file or export before running.');
+if (!sessdata || !sessdata.includes('#')) {
+  console.error('❌ Invalid SESSION_ID. It must be the full MEGA URL or at least include the hash. (e.g., https://mega.nz/file/abc123#XYZ456...)');
   process.exit(1);
 }
-const MEGA_SESSION_URL = `https://mega.nz/file/${sessdata}`;
 
-// Ensure folders
+let MEGA_SESSION_URL = sessdata;
+if (!sessdata.startsWith('https://mega.nz/file/')) {
+  MEGA_SESSION_URL = 'https://mega.nz/file/' + sessdata;
+}
+
+// Clean and prepare folders
 if (fs.existsSync(DOWNLOAD_PATH)) fs.rmSync(DOWNLOAD_PATH, { recursive: true, force: true });
 fs.mkdirSync(DOWNLOAD_PATH, { recursive: true });
 fs.mkdirSync(EXTRACT_PATH, { recursive: true });
@@ -64,7 +69,7 @@ async function downloadMegaSession() {
 
   return new Promise((resolve, reject) => {
     file.loadAttributes((err) => {
-      if (err) return reject('❌ Failed to load MEGA file attributes.');
+      if (err) return reject('❌ Failed to load MEGA file attributes. Check SESSION_ID.');
 
       const mainFolder = getFirstFolder(EXTRACT_PATH);
       const sessionPath = path.join(mainFolder, SESSION_FILE_NAME);
