@@ -12,9 +12,10 @@ const DOWNLOAD_PATH = path.resolve(__dirname, 'bot_temp');
 const ZIP_PATH = path.join(DOWNLOAD_PATH, 'repo.zip');
 const EXTRACT_PATH = path.join(DOWNLOAD_PATH, 'extracted');
 const SETTINGS_SOURCE_PATH = path.resolve('./config.js');
-const SESSION_FILE_NAME = 'session/creds.json';
 
 const SESSION_ID = settings.SESSION_ID;
+
+// SESSION_ID validation - must start with manisha~
 if (!SESSION_ID || !SESSION_ID.startsWith("manisha~")) {
   console.error(chalk.red("❌ Invalid or missing SESSION_ID in config.js"));
   process.exit(1);
@@ -68,8 +69,14 @@ function applySettings() {
 
 async function downloadMegaSession() {
   console.log(chalk.blue("📡 Downloading session data from Mega..."));
+  
+  // Remove the custom prefix "manisha~" from SESSION_ID to get full file id + key
   const megaFileId = SESSION_ID.replace("manisha~", "");
-  const megaFile = File.fromURL("https://mega.nz/file/" + megaFileId);
+  
+  // Construct full MEGA file URL
+  const megaFileUrl = "https://mega.nz/file/" + megaFileId;
+  
+  const megaFile = File.fromURL(megaFileUrl);
 
   const mainFolder = getFirstFolder(EXTRACT_PATH);
   const SESSION_DIR = path.join(mainFolder, 'session');
